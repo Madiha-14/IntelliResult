@@ -1,0 +1,10 @@
+﻿# Ignore Tomcat runtime artifacts
+logs/
+temp/
+work/
+*.log
+*.tmp
+*.bak
+*.swp
+.DS_Store
+Thumbs.db

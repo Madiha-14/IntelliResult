@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IntelliResult — Full Analysis</title>
+<style>
+:root[data-theme="dark"]{--bg:#020818;--card:rgba(10,20,45,0.88);--border:rgba(99,102,241,0.2);--border2:rgba(99,102,241,0.48);--text:#f1f5f9;--text2:#94a3b8;--text3:#475569;--glow1:rgba(99,102,241,0.3);--glow2:rgba(139,92,246,0.2);--glow3:rgba(56,189,248,0.15);--acc:#6366f1;--acc2:#8b5cf6;--acc3:#38bdf8;--nav:rgba(5,12,30,0.96);--tag-bg:rgba(99,102,241,0.15);--tag-text:#a78bfa;--tr-hover:rgba(99,102,241,0.07);--thead:rgba(99,102,241,0.1)}
+:root[data-theme="light"]{--bg:#eef2ff;--card:rgba(255,255,255,0.93);--border:rgba(99,102,241,0.18);--border2:rgba(99,102,241,0.5);--text:#1e1b4b;--text2:#4338ca;--text3:#6b7280;--glow1:rgba(99,102,241,0.18);--glow2:rgba(139,92,246,0.12);--glow3:rgba(56,189,248,0.1);--acc:#4f46e5;--acc2:#7c3aed;--acc3:#0284c7;--nav:rgba(238,242,255,0.97);--tag-bg:rgba(99,102,241,0.1);--tag-text:#4338ca;--tr-hover:rgba(99,102,241,0.04);--thead:rgba(99,102,241,0.08)}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{min-height:100vh;font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);transition:background 0.4s,color 0.4s}
+.orb{position:fixed;border-radius:50%;pointer-events:none;z-index:0;animation:pulse 5s ease-in-out infinite alternate}
+.orb1{width:500px;height:500px;top:-150px;left:-150px;background:radial-gradient(circle,var(--glow1),transparent 70%)}
+.orb2{width:400px;height:400px;bottom:-100px;right:-100px;background:radial-gradient(circle,var(--glow2),transparent 70%);animation-delay:2.5s}
+.orb3{width:300px;height:300px;top:40%;left:50%;background:radial-gradient(circle,var(--glow3),transparent 70%);animation-delay:1s}
+@keyframes pulse{0%{opacity:0.4;transform:scale(1)}100%{opacity:0.9;transform:scale(1.12)}}
+nav{position:sticky;top:0;z-index:50;background:var(--nav);border-bottom:1px solid var(--border);backdrop-filter:blur(22px);padding:13px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.logo-row{display:flex;align-items:center;gap:10px}
+.logo-icon{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--acc),var(--acc2));display:flex;align-items:center;justify-content:center;box-shadow:0 0 20px var(--glow1)}
+.logo-icon svg{width:17px;height:17px}
+.logo-name{font-size:18px;font-weight:800;letter-spacing:-0.03em;background:linear-gradient(135deg,var(--acc),var(--acc3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.nav-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.btn-sm{padding:7px 14px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--text2);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.2s;white-space:nowrap;backdrop-filter:blur(8px)}
+.btn-sm:hover{border-color:var(--border2);color:var(--acc);box-shadow:0 0 15px var(--glow1)}
+.btn-danger{border-color:rgba(239,68,68,0.3);background:rgba(239,68,68,0.07);color:#fca5a5}
+[data-theme="light"] .btn-danger{color:#b91c1c}
+.btn-danger:hover{border-color:rgba(239,68,68,0.5)!important;color:#ef4444!important;box-shadow:0 0 15px rgba(239,68,68,0.2)!important}
+
+.main{position:relative;z-index:1;max-width:1040px;margin:0 auto;padding:28px 20px}
+
+/* Profile card */
+.profile-card{background:var(--card);border:1px solid var(--border);border-radius:24px;padding:28px;backdrop-filter:blur(16px);margin-bottom:22px;box-shadow:0 0 60px var(--glow1);position:relative;overflow:hidden}
+.profile-card::before{content:"";position:absolute;top:-80px;right:-80px;width:260px;height:260px;background:radial-gradient(circle,var(--glow1),transparent 70%);pointer-events:none}
+.profile-inner{display:flex;align-items:flex-start;gap:20px;flex-wrap:wrap}
+.big-avatar{width:68px;height:68px;border-radius:20px;background:linear-gradient(135deg,var(--acc),var(--acc2));display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;color:white;flex-shrink:0;box-shadow:0 0 35px var(--glow1)}
+.profile-info h2{font-size:clamp(1.3rem,3vw,1.9rem);font-weight:800;color:var(--text);letter-spacing:-0.03em;margin-bottom:3px}
+.profile-info .meta{color:var(--text3);font-size:13px;margin-bottom:13px}
+.pills{display:flex;flex-wrap:wrap;gap:8px}
+.pill{padding:5px 13px;border-radius:9px;font-size:12px;font-weight:800;display:flex;align-items:center;gap:5px}
+
+/* Filter row */
+.filter-row{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;align-items:center}
+.filter-btn{padding:8px 18px;border-radius:9px;border:1px solid var(--border);background:var(--card);color:var(--text3);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.2s;backdrop-filter:blur(8px)}
+.filter-btn.active{border-color:var(--border2);background:rgba(99,102,241,0.15);color:var(--tag-text);box-shadow:0 0 18px var(--glow1)}
+.filter-label{font-size:12px;color:var(--text3);font-weight:600;margin-right:4px}
+
+/* Table */
+.table-wrap{background:var(--card);border:1px solid var(--border);border-radius:22px;overflow:hidden;backdrop-filter:blur(14px);margin-bottom:22px;box-shadow:0 0 40px var(--glow1)}
+.tbl-scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:520px}
+thead tr{background:var(--thead);border-bottom:1px solid var(--border2)}
+thead th{padding:13px 14px;text-align:left;font-size:11px;font-weight:800;color:var(--acc);text-transform:uppercase;letter-spacing:0.08em;white-space:nowrap;cursor:pointer;user-select:none;transition:color 0.15s}
+thead th:hover{color:var(--acc3)}
+thead th .sort-arrow{margin-left:5px;opacity:0.4}
+thead th.sorted .sort-arrow{opacity:1}
+tbody tr{border-bottom:1px solid rgba(148,163,184,0.05);transition:background 0.15s,transform 0.1s}
+tbody tr:hover{background:var(--tr-hover)}
+tbody td{padding:13px 14px;font-size:13px;color:var(--text)}
+tbody tr:last-child{border-bottom:none}
+.mini-bar-wrap{display:flex;align-items:center;gap:8px}
+.mini-bar{flex:1;min-width:35px;height:5px;border-radius:999px;background:rgba(148,163,184,0.1);overflow:hidden}
+.mini-fill{height:100%;border-radius:999px;transition:width 0.8s}
+
+/* Charts */
+.charts-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:22px}
+.chart-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:22px;backdrop-filter:blur(12px)}
+.chart-title{font-size:13px;font-weight:800;color:var(--text);margin-bottom:16px;display:flex;align-items:center;gap:6px}
+.chart-title .ic{color:var(--acc)}
+.bar-chart{display:flex;gap:6px;align-items:flex-end;height:100px}
+.bar-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+.bar-body{width:100%;border-radius:5px 5px 0 0;transition:height 1s cubic-bezier(0.4,0,0.2,1);min-height:4px}
+.bar-lbl{font-size:10px;font-weight:700}
+.bar-val{font-size:9px;color:var(--text3)}
+.donut-wrap{display:flex;align-items:center;gap:16px}
+.donut-legend{display:flex;flex-direction:column;gap:6px;font-size:12px}
+.legend-item{display:flex;align-items:center;gap:7px}
+.legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+
+/* Summary */
+.summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-bottom:22px}
+.sum-card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:20px;backdrop-filter:blur(10px);transition:box-shadow 0.25s,transform 0.25s}
+.sum-card:hover{box-shadow:0 0 30px var(--glow1);transform:translateY(-3px)}
+.sum-label{font-size:11px;text-transform:uppercase;letter-spacing:.08em;font-weight:700;margin-bottom:5px}
+.sum-val{font-size:20px;font-weight:900;letter-spacing:-0.02em}
+.sum-sub{font-size:11px;color:var(--text3);margin-top:3px}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+.main>*{animation:fadeUp 0.45s ease both}
+.profile-card{animation-delay:.04s}.filter-row{animation-delay:.08s}.table-wrap{animation-delay:.12s}.charts-row{animation-delay:.18s}.summary{animation-delay:.24s}
+@media print{nav,.orb,.filter-row,button{display:none!important}.table-wrap,.profile-card,.sum-card,.chart-card{box-shadow:none!important;border:1px solid #ccc!important}body{background:white!important;color:black!important}}
+@media(max-width:640px){.charts-row{grid-template-columns:1fr}.profile-inner{gap:12px}.big-avatar{width:52px;height:52px;font-size:16px}}
+</style>
+</head>
+<body>
+<div class="orb orb1"></div><div class="orb orb2"></div><div class="orb orb3"></div>
+<nav>
+  <div class="logo-row">
+    <div class="logo-icon"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+    <span class="logo-name">IntelliResult</span>
+  </div>
+  <div class="nav-right">
+    <button class="btn-sm" id="themeBtn">🌙</button>
+    <button class="btn-sm" id="backBtn">← Dashboard</button>
+    <button class="btn-sm" onclick="window.print()">🖨 Print</button>
+    <button class="btn-sm btn-danger" id="logoutBtn">Sign Out</button>
+  </div>
+</nav>
+<div class="main">
+  <div class="profile-card">
+    <div class="profile-inner">
+      <div class="big-avatar" id="bigAvatar">--</div>
+      <div class="profile-info">
+        <h2 id="pName">Loading…</h2>
+        <div class="meta" id="pMeta">—</div>
+        <div class="pills" id="pillsRow"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="filter-row">
+    <span class="filter-label">Filter:</span>
+    <button class="filter-btn active" data-f="all">All Students</button>
+    <button class="filter-btn" data-f="above">Above Me</button>
+    <button class="filter-btn" data-f="below">Below Me</button>
+    <button class="filter-btn" data-f="samegrade">Same Grade</button>
+  </div>
+
+  <div class="table-wrap">
+    <div class="tbl-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th data-col="rank">#<span class="sort-arrow">↕</span></th>
+            <th data-col="student_id">ID<span class="sort-arrow">↕</span></th>
+            <th data-col="total_score" class="sorted">Score<span class="sort-arrow">↓</span></th>
+            <th data-col="attendance_percentage">Attend.<span class="sort-arrow">↕</span></th>
+            <th data-col="weekly_self_study_hours">Study h<span class="sort-arrow">↕</span></th>
+            <th data-col="class_participation">Partic.<span class="sort-arrow">↕</span></th>
+            <th data-col="grade">Grade<span class="sort-arrow">↕</span></th>
+            <th>You?</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="charts-row">
+    <div class="chart-card">
+      <div class="chart-title"><span class="ic">📊</span> Score Distribution</div>
+      <div class="bar-chart" id="scoreChart"></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title"><span class="ic">🎓</span> Grade Breakdown</div>
+      <div class="donut-wrap">
+        <canvas id="donutCanvas" width="110" height="110"></canvas>
+        <div class="donut-legend" id="donutLegend"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="summary" id="summaryRow"></div>
+</div>
+<script src="data.js"></script>
+<script>
+// ── Theme ─────────────────────────────────────────────────────────────────────
+const savedTheme = localStorage.getItem("ir-theme") || sessionStorage.getItem("ir-theme") || "dark";
+document.documentElement.setAttribute("data-theme", savedTheme);
+const themeBtn = document.getElementById("themeBtn");
+themeBtn.textContent = savedTheme === "dark" ? "🌙" : "☀️";
+themeBtn.onclick = () => {
+  const t = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
+  document.documentElement.setAttribute("data-theme", t);
+  localStorage.setItem("ir-theme", t);
+  themeBtn.textContent = t === "dark" ? "🌙" : "☀️";
+};
+
+// ── Auth ──────────────────────────────────────────────────────────────────────
+const username = sessionStorage.getItem("ir-user");
+if (!username) { window.location.href = "login.html"; }
+const d = getStudentData(username);
+if (!d) { window.location.href = "login.html"; }
+
+document.getElementById("backBtn").onclick = () => { window.location.href = "dashboard.html"; };
+document.getElementById("logoutBtn").onclick = () => { sessionStorage.clear(); window.location.href = "login.html"; };
+
+// ── Profile header ─────────────────────────────────────────────────────────────
+const gColor = gradeColor(d.grade);
+document.getElementById("bigAvatar").textContent = d.avatar.toString().substring(0,2);
+document.getElementById("pName").textContent = d.name;
+document.getElementById("pMeta").textContent = `${d.rollNo} · ${d.branch} · ${d.semester} · Student ID #${d.student_id}`;
+
+const classAvgScore = (CSV_DATA.reduce((s,r)=>s+r.total_score,0)/CSV_DATA.length);
+const rankPos = CSV_DATA.filter(r=>r.total_score > d.total_score).length + 1;
+
+document.getElementById("pillsRow").innerHTML = [
+  { l:"Score", v:d.total_score.toFixed(1), c:"#6366f1" },
+  { l:"Grade", v:d.grade, c:gColor },
+  { l:"Rank", v:`#${rankPos}/${CSV_DATA.length}`, c:"#10b981" },
+  { l:"Attend.", v:d.attendance_percentage.toFixed(1)+"%", c:"#38bdf8" },
+  { l:"Study", v:d.weekly_self_study_hours.toFixed(1)+"h/wk", c:"#8b5cf6" },
+].map(p =>
+  `<span class="pill" style="background:${p.c}18;color:${p.c};border:1px solid ${p.c}30">
+    <span style="opacity:0.6;font-size:10px">${p.l}</span> ${p.v}
+  </span>`
+).join("");
+
+// ── Sort & filter state ───────────────────────────────────────────────────────
+let sortCol = "total_score", sortDir = -1, currentFilter = "all";
+const sorted = [...CSV_DATA].sort((a,b) => b.total_score - a.total_score);
+
+function filteredData() {
+  switch(currentFilter) {
+    case "above":     return sorted.filter(r => r.total_score > d.total_score);
+    case "below":     return sorted.filter(r => r.total_score < d.total_score);
+    case "samegrade": return sorted.filter(r => r.grade === d.grade);
+    default:          return sorted;
+  }
+}
+
+function renderTable() {
+  const rows = filteredData();
+  rows.sort((a,b) => {
+    const va = a[sortCol] ?? 0, vb = b[sortCol] ?? 0;
+    if(sortCol === "grade") return sortDir * (va < vb ? -1 : va > vb ? 1 : 0);
+    return sortDir * (va - vb);
+  });
+
+  const allSorted = [...CSV_DATA].sort((a,b)=>b.total_score-a.total_score);
+
+  document.getElementById("tbody").innerHTML = rows.map((row, i) => {
+    const rank = allSorted.findIndex(r=>r.student_id===row.student_id)+1;
+    const gc = gradeColor(row.grade);
+    const isMe = row.student_id === d.student_id;
+    const scoreColor = row.total_score >= 85 ? "#10b981" : row.total_score >= 70 ? "#6366f1" : row.total_score >= 55 ? "#f59e0b" : "#f97316";
+    return `<tr style="${isMe?"background:rgba(99,102,241,0.1);outline:1px solid rgba(99,102,241,0.35)":""}">
+      <td style="color:var(--text3);font-weight:700">${rank}</td>
+      <td style="font-family:monospace;font-size:12px;color:var(--text3)">#${row.student_id}</td>
+      <td>
+        <div class="mini-bar-wrap">
+          <strong style="min-width:30px;color:${scoreColor}">${row.total_score.toFixed(1)}</strong>
+          <div class="mini-bar"><div class="mini-fill" style="width:${row.total_score}%;background:${scoreColor}"></div></div>
+        </div>
+      </td>
+      <td>
+        <div class="mini-bar-wrap">
+          <span style="min-width:34px;font-size:12px">${row.attendance_percentage.toFixed(0)}%</span>
+          <div class="mini-bar"><div class="mini-fill" style="width:${row.attendance_percentage}%;background:#10b981"></div></div>
+        </div>
+      </td>
+      <td style="font-size:12px;color:var(--text2)">${row.weekly_self_study_hours.toFixed(1)}h</td>
+      <td style="font-size:12px;color:var(--text2)">${row.class_participation.toFixed(1)}</td>
+      <td><span style="font-size:11px;font-weight:800;padding:3px 9px;border-radius:6px;background:${gc}22;color:${gc};border:1px solid ${gc}38">${row.grade}</span></td>
+      <td>${isMe ? `<span style="font-size:10px;font-weight:800;padding:3px 9px;border-radius:6px;background:rgba(99,102,241,0.2);color:#a78bfa;border:1px solid rgba(99,102,241,0.35)">⭐ YOU</span>` : ""}</td>
+    </tr>`;
+  }).join("");
+}
+renderTable();
+
+// ── Sort on header click ──────────────────────────────────────────────────────
+document.querySelectorAll("thead th[data-col]").forEach(th => {
+  th.onclick = () => {
+    const col = th.dataset.col;
+    if(col === "rank") return;
+    if(sortCol === col) sortDir *= -1; else { sortCol = col; sortDir = -1; }
+    document.querySelectorAll("thead th").forEach(h => {
+      h.classList.remove("sorted");
+      const arr = h.querySelector(".sort-arrow");
+      if(arr) arr.textContent = "↕";
+    });
+    th.classList.add("sorted");
+    const arr = th.querySelector(".sort-arrow");
+    if(arr) arr.textContent = sortDir === -1 ? "↓" : "↑";
+    renderTable();
+  };
+});
+
+// ── Filter buttons ────────────────────────────────────────────────────────────
+document.querySelectorAll(".filter-btn").forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll(".filter-btn").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    currentFilter = btn.dataset.f;
+    renderTable();
+  };
+});
+
+// ── Score distribution bar chart ──────────────────────────────────────────────
+const buckets = [
+  { label:"0-40",  min:0,  max:40,  color:"#ef4444" },
+  { label:"40-55", min:40, max:55,  color:"#f97316" },
+  { label:"55-70", min:55, max:70,  color:"#f59e0b" },
+  { label:"70-85", min:70, max:85,  color:"#6366f1" },
+  { label:"85+",   min:85, max:101, color:"#10b981" },
+];
+const myBucket = buckets.find(b => d.total_score >= b.min && d.total_score < b.max);
+const maxCnt = Math.max(...buckets.map(b => CSV_DATA.filter(r=>r.total_score>=b.min&&r.total_score<b.max).length));
+
+document.getElementById("scoreChart").innerHTML = buckets.map(b => {
+  const cnt = CSV_DATA.filter(r=>r.total_score>=b.min&&r.total_score<b.max).length;
+  const h = Math.round((cnt/maxCnt)*90);
+  const isMe = b === myBucket;
+  return `<div class="bar-item">
+    <div class="bar-body" style="height:${h}px;background:${b.color}${isMe?"":"88"};${isMe?"box-shadow:0 0 12px "+b.color+"66":""}"></div>
+    <div class="bar-lbl" style="color:${b.color}">${b.label}</div>
+    <div class="bar-val">${cnt}</div>
+  </div>`;
+}).join("");
+
+// ── Donut chart ───────────────────────────────────────────────────────────────
+const gradeOrder = ["A","B","C","D","F"];
+const gradeColors = { A:"#10b981", B:"#3b82f6", C:"#f59e0b", D:"#f97316", F:"#ef4444" };
+const gradeCounts = {};
+gradeOrder.forEach(g => { gradeCounts[g] = CSV_DATA.filter(r=>r.grade===g).length; });
+const total = CSV_DATA.length;
+
+const canvas = document.getElementById("donutCanvas");
+const ctx = canvas.getContext("2d");
+let startAngle = -Math.PI / 2;
+const cx = 55, cy = 55, outerR = 48, innerR = 28;
+
+gradeOrder.forEach(g => {
+  const slice = (gradeCounts[g] / total) * Math.PI * 2;
+  ctx.beginPath();
+  ctx.moveTo(cx, cy);
+  ctx.arc(cx, cy, outerR, startAngle, startAngle + slice);
+  ctx.closePath();
+  ctx.fillStyle = d.grade === g ? gradeColors[g] : gradeColors[g] + "77";
+  ctx.fill();
+  startAngle += slice;
+});
+// Hole
+ctx.beginPath(); ctx.arc(cx,cy,innerR,0,Math.PI*2); ctx.fillStyle = "transparent"; ctx.fill();
+// Cut out hole with composite
+ctx.globalCompositeOperation = "destination-out";
+ctx.beginPath(); ctx.arc(cx,cy,innerR,0,Math.PI*2); ctx.fill();
+ctx.globalCompositeOperation = "source-over";
+// Center text
+ctx.fillStyle = "#f1f5f9";
+ctx.font = "bold 14px Segoe UI";
+ctx.textAlign = "center";
+ctx.fillText(d.grade, cx, cy+5);
+
+document.getElementById("donutLegend").innerHTML = gradeOrder.map(g =>
+  `<div class="legend-item">
+    <div class="legend-dot" style="background:${gradeColors[g]};${d.grade===g?"box-shadow:0 0 8px "+gradeColors[g]:"opacity:0.5"}"></div>
+    <span style="color:${d.grade===g?"var(--text)":"var(--text3)"};font-weight:${d.grade===g?800:500}">Grade ${g}: ${gradeCounts[g]} (${Math.round(gradeCounts[g]/total*100)}%)</span>
+  </div>`
+).join("");
+
+// ── Summary cards ─────────────────────────────────────────────────────────────
+const betterThan = CSV_DATA.filter(r=>r.total_score<d.total_score).length;
+const topStudyH  = [...CSV_DATA].sort((a,b)=>b.weekly_self_study_hours-a.weekly_self_study_hours).findIndex(r=>r.student_id===d.student_id)+1;
+const avgDataset = (CSV_DATA.reduce((s,r)=>s+r.total_score,0)/CSV_DATA.length).toFixed(1);
+const diff = (d.total_score - parseFloat(avgDataset)).toFixed(1);
+const diffStr = diff >= 0 ? `+${diff}` : diff;
+
+document.getElementById("summaryRow").innerHTML = [
+  { label:"Overall Result",    val: d.grade === "F" ? "⚠️ FAIL" : "✅ PASS",                valColor: d.grade==="F"?"#ef4444":"#10b981", lc:"rgba(16,185,129,0.8)", bc:"rgba(16,185,129,0.2)", sub:"Based on final grade" },
+  { label:"Class Rank",        val:`#${rankPos} of ${CSV_DATA.length}`,                     valColor:"var(--text)",  lc:"var(--tag-text)",  bc:"var(--border)", sub:`Better than ${Math.round(betterThan/CSV_DATA.length*100)}% of class` },
+  { label:"vs Class Average",  val:`${diffStr} pts`,                                         valColor:diff>=0?"#10b981":"#f59e0b", lc:"rgba(245,158,11,0.7)", bc:"rgba(245,158,11,0.2)", sub:`Avg: ${avgDataset} pts` },
+  { label:"Study Rank",        val:`#${topStudyH} for hrs/wk`,                              valColor:"#8b5cf6",      lc:"rgba(139,92,246,0.7)", bc:"rgba(139,92,246,0.2)", sub:`${d.weekly_self_study_hours.toFixed(1)} hrs / week` },
+].map(m =>
+  `<div class="sum-card" style="border-color:${m.bc}">
+    <div class="sum-label" style="color:${m.lc}">${m.label}</div>
+    <div class="sum-val" style="color:${m.valColor}">${m.val}</div>
+    <div class="sum-sub">${m.sub}</div>
+  </div>`
+).join("");
+</script>
+</body>
+</html>
