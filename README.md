@@ -174,7 +174,7 @@ in your preferred web browser.
 
 <div align="center">
 
-## Madiha Ali
+## Madiha 
 
 **B.Tech – Computer Science & Engineering (Data Science)**
 
